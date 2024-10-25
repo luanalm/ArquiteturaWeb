@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.example.ac2.dtos.DadosFuncionarioDTO;
 import com.example.ac2.dtos.DadosProjetoDTO;
 import com.example.ac2.dtos.FuncionarioDTO;
 import com.example.ac2.dtos.ProjetoDTO;
@@ -23,6 +24,7 @@ public class ProjetoServiceImpl implements ProjetoService {
     private final ProjetoRepository projetoRepository;
     private final FuncionarioRepository funcionarioRepository;
     
+    @SuppressWarnings("unchecked")
     @Override
     @Transactional
     public Projeto salvar(ProjetoDTO projetoDTO) {
@@ -34,7 +36,7 @@ public class ProjetoServiceImpl implements ProjetoService {
         projeto.setDescricao(projetoDTO.getDescricao());
         projeto.setDataInicio(projetoDTO.getDataInicio());
         projeto.setDataFim(projetoDTO.getDataFim());
-        projeto.setFuncionario(func);
+        projeto.setFuncionarios((List<Funcionario>) func);
         return projetoRepository.save(projeto);
     }
 
@@ -47,8 +49,8 @@ public class ProjetoServiceImpl implements ProjetoService {
             .dataInicio(c.getDataInicio())
             .dataFim(c.getDataFim())
             .funcionario(FuncionarioDTO.builder()
-                .id(c.getFuncionario().getId())
-                .nome(c.getFuncionario().getNome())
+                .id(((DadosProjetoDTO) c.getFuncionarios()).getId())
+                .nome(((FuncionarioDTO) c.getFuncionarios()).getNome())
                 .build())
             .build();
         }).orElseThrow(() -> new RegraNegocioException("Projeto não encontrado."));
@@ -60,6 +62,7 @@ public class ProjetoServiceImpl implements ProjetoService {
         projetoRepository.deleteById(id);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     @Transactional
     public void editar(Long id, ProjetoDTO projetoDto) {
@@ -73,7 +76,7 @@ public class ProjetoServiceImpl implements ProjetoService {
         projeto.setDescricao(projetoDto.getDescricao());
         projeto.setDataInicio(projetoDto.getDataInicio());
         projeto.setDataFim(projetoDto.getDataFim());
-        projeto.setFuncionario(funcionario);
+        projeto.setFuncionarios((List<Funcionario>) funcionario);
 
         projetoRepository.save(projeto);
     }
@@ -87,10 +90,16 @@ public class ProjetoServiceImpl implements ProjetoService {
                 .dataInicio(c.getDataInicio())
                 .dataFim(c.getDataFim())
                 .funcionario(FuncionarioDTO.builder()
-                    .id(c.getFuncionario().getId())
-                    .nome(c.getFuncionario().getNome())
+                    .id(((DadosProjetoDTO) c.getFuncionarios()).getId())
+                    .nome(((FuncionarioDTO) c.getFuncionarios()).getNome())
                     .build())
                 .build();
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void vincularFuncionario(DadosProjetoDTO projeto, DadosFuncionarioDTO funcionario) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'vincularFuncionario'");
     }
 }
